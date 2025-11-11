@@ -6,7 +6,7 @@
     "dev": " bunx --bun vite dev --port 3000",
     "build": "bunx --bun vite build",
     "preview": "bunx --bun vite preview",
-    "start": "bun run ./build"
+    "start": "bun run ./.output/server"
   },
   "dependencies": {
     "@davis7dotsh/river-adapter-tanstack": "^0.2.1",
