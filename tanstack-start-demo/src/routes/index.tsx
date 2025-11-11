@@ -133,7 +133,6 @@ const QuestionAskerDemo = () => {
     },
     onStart: () => {
       console.log("start");
-      setConversation([]);
       setIsLoading(true);
     },
     onFatalError: (error) => {
@@ -156,6 +155,7 @@ const QuestionAskerDemo = () => {
 
   const handleAsk = async () => {
     if (!trimmedQuestion || isLoading) return;
+    handleClear();
     setConversation((prev) => [
       ...prev,
       {
