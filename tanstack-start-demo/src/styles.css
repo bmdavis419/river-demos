@@ -1,8 +1,6 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-html {
-}
 
 body {
   @apply m-0 bg-neutral-900 text-white;
