@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { myRiverClient } from "@/lib/river/client";
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import Markdown from "react-markdown";
 import { createStandardSchemaV1, parseAsString, useQueryStates } from "nuqs";
 import { ToolsWithInputOutput } from "@/lib/river/streams";
@@ -61,6 +61,7 @@ const QuestionAskerDemo = () => {
 
   const questionCaller = myRiverClient.askQuestion.useStream({
     onChunk: (chunk) => {
+      console.log("chunk", chunk);
       if (chunk.type === "text-start") {
         setConversation((prev) => [
           ...prev,
@@ -89,12 +90,12 @@ const QuestionAskerDemo = () => {
         });
       }
 
-      if (chunk.type === "tool-call") {
+      if (chunk.type === "tool-input-start") {
         setConversation((prev) => [
           ...prev,
           {
             role: "tool",
-            id: chunk.toolCallId,
+            id: chunk.id,
             tool: null,
           },
         ]);
@@ -198,12 +199,20 @@ const QuestionAskerDemo = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <button
-        onClick={handleLogout}
-        className="fixed top-4 left-4 px-4 py-2 bg-neutral-700 text-white rounded-lg font-medium hover:bg-neutral-600 transition-colors z-10"
-      >
-        Logout
-      </button>
+      <div className="fixed top-4 right-4 flex items-center gap-3">
+        <button
+          onClick={handleLogout}
+          className="px-4 py-2 bg-neutral-700 text-white rounded-lg font-medium hover:bg-neutral-600 transition-colors z-10"
+        >
+          Logout
+        </button>
+        <Link
+          to="/basic"
+          className="px-4 py-2 bg-neutral-700 text-white rounded-lg font-medium hover:bg-neutral-600 transition-colors z-10"
+        >
+          Other Examples
+        </Link>
+      </div>
       <div className="flex-1 overflow-y-auto p-6 pb-32">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold mb-8 text-white">
@@ -213,7 +222,7 @@ const QuestionAskerDemo = () => {
             if (message.role === "user") {
               return (
                 <div key={index} className="mb-6">
-                  <div className="bg-neutral-800 rounded-lg p-6">
+                  <div className="border-neutral-800 rounded-lg p-6 border-2">
                     <p className="text-neutral-100 whitespace-pre-wrap">
                       {message.content}
                     </p>

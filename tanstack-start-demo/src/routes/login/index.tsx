@@ -1,5 +1,5 @@
 import { serverCheckAuthStatus, serverLogin } from "@/lib/auth";
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 
 export const Route = createFileRoute("/login/")({
@@ -45,7 +45,29 @@ function RouteComponent() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-900 p-6">
+    <div className="min-h-screen flex items-center flex-col justify-center bg-neutral-900 p-6 gap-8">
+      <div className="flex flex-col gap-3">
+        <p className="text-neutral-300 text-lg max-w-lg">
+          The resuming stream demo is locked behind a password since it hit's an
+          LLM endpoint and a DB. If you want to try it,{" "}
+          <a
+            href="https://github.com/bmdavis419/river-demos/tree/main/tanstack-start-demo"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 hover:text-blue-600"
+          >
+            check out the repo
+          </a>
+          !
+        </p>
+        <p className="text-neutral-200 text-lg">
+          If you do want to try a basic demo,{" "}
+          <Link to="/basic" className="text-blue-500 hover:text-blue-600">
+            click here
+          </Link>
+          !
+        </p>
+      </div>
       <div className="w-full max-w-md">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

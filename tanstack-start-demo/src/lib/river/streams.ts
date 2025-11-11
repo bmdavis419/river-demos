@@ -6,7 +6,11 @@ import {
   tool,
   ToolSet,
 } from "ai";
-import { createRiverStream, RiverError } from "@davis7dotsh/river-core";
+import {
+  createRiverStream,
+  defaultRiverProvider,
+  RiverError,
+} from "@davis7dotsh/river-core";
 import { z } from "zod";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { createServerOnlyFn } from "@tanstack/react-start";
@@ -14,6 +18,8 @@ import type { TanStackStartAdapterRequest } from "@davis7dotsh/river-adapter-tan
 import { redisProvider } from "@davis7dotsh/river-provider-redis";
 import { redisClient } from "../db";
 import { checkAuthStatus } from "../auth";
+
+// QUESTION ASKER RESUMABLE STREAM
 
 const getOpenRouterApiKey = createServerOnlyFn(() => {
   const apiKey = process.env.OPENROUTER_API_KEY;
@@ -126,6 +132,39 @@ export const streamAskQuestion = createRiverStream<
 
     for await (const chunk of questionAskerAgent({ question })) {
       appendChunk(chunk);
+    }
+
+    await close();
+  });
+
+// BASIC DEMO NON-RESUMABLE STREAM
+
+type ClassifyChunkType = {
+  character: string;
+  type: "vowel" | "consonant" | "special";
+};
+
+export const streamClassifyCharacters = createRiverStream<
+  ClassifyChunkType,
+  TanStackStartAdapterRequest
+>()
+  .input(z.object({ message: z.string() }))
+  .provider(defaultRiverProvider())
+  .runner(async ({ input, stream, abortSignal }) => {
+    const { message } = input;
+    const { appendChunk, close } = stream;
+
+    const characters = message.split("");
+
+    for (const character of characters) {
+      if (abortSignal.aborted) break;
+      const type = character.match(/[aeiou]/i)
+        ? "vowel"
+        : character.match(/[bcdfghjklmnpqrstvwxyz]/i)
+          ? "consonant"
+          : "special";
+      await appendChunk({ character, type });
+      await new Promise((resolve) => setTimeout(resolve, 15));
     }
 
     await close();

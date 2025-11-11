@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
+import { Route as BasicIndexRouteImport } from './routes/basic/index'
 import { Route as ApiRiverIndexRouteImport } from './routes/api/river/index'
 
 const IndexRoute = IndexRouteImport.update({
@@ -23,6 +24,11 @@ const LoginIndexRoute = LoginIndexRouteImport.update({
   path: '/login/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BasicIndexRoute = BasicIndexRouteImport.update({
+  id: '/basic/',
+  path: '/basic/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiRiverIndexRoute = ApiRiverIndexRouteImport.update({
   id: '/api/river/',
   path: '/api/river/',
@@ -31,30 +37,34 @@ const ApiRiverIndexRoute = ApiRiverIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/basic': typeof BasicIndexRoute
   '/login': typeof LoginIndexRoute
   '/api/river': typeof ApiRiverIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/basic': typeof BasicIndexRoute
   '/login': typeof LoginIndexRoute
   '/api/river': typeof ApiRiverIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/basic/': typeof BasicIndexRoute
   '/login/': typeof LoginIndexRoute
   '/api/river/': typeof ApiRiverIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/api/river'
+  fullPaths: '/' | '/basic' | '/login' | '/api/river'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/api/river'
-  id: '__root__' | '/' | '/login/' | '/api/river/'
+  to: '/' | '/basic' | '/login' | '/api/river'
+  id: '__root__' | '/' | '/basic/' | '/login/' | '/api/river/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BasicIndexRoute: typeof BasicIndexRoute
   LoginIndexRoute: typeof LoginIndexRoute
   ApiRiverIndexRoute: typeof ApiRiverIndexRoute
 }
@@ -75,6 +85,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/basic/': {
+      id: '/basic/'
+      path: '/basic'
+      fullPath: '/basic'
+      preLoaderRoute: typeof BasicIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/river/': {
       id: '/api/river/'
       path: '/api/river'
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BasicIndexRoute: BasicIndexRoute,
   LoginIndexRoute: LoginIndexRoute,
   ApiRiverIndexRoute: ApiRiverIndexRoute,
 }
