@@ -46,7 +46,7 @@ type QuestionConversationDisplay =
   | {
       role: "tool";
       id: string;
-      tool: ToolsWithInputOutput;
+      tool: ToolsWithInputOutput | null;
     };
 
 const QuestionAskerDemo = () => {
@@ -89,19 +89,38 @@ const QuestionAskerDemo = () => {
         });
       }
 
-      if (chunk.type === "tool-result" && !chunk.dynamic) {
+      if (chunk.type === "tool-call") {
         setConversation((prev) => [
           ...prev,
           {
             role: "tool",
             id: chunk.toolCallId,
-            tool: {
-              name: chunk.toolName,
-              input: chunk.input,
-              output: chunk.output,
-            },
+            tool: null,
           },
         ]);
+      }
+
+      if (chunk.type === "tool-result" && !chunk.dynamic) {
+        setConversation((prev) => {
+          const existingTool = prev.find(
+            (c) => c.role === "tool" && c.id === chunk.toolCallId
+          );
+          if (existingTool && existingTool.role === "tool") {
+            return prev.map((c) =>
+              c.role === "tool" && c.id === chunk.toolCallId
+                ? {
+                    ...c,
+                    tool: {
+                      name: chunk.toolName,
+                      input: chunk.input,
+                      output: chunk.output,
+                    },
+                  }
+                : c
+            );
+          }
+          return prev;
+        });
       }
     },
     onError: (error) => {
@@ -216,6 +235,16 @@ const QuestionAskerDemo = () => {
               );
             }
             if (message.role === "tool") {
+              if (!message.tool)
+                return (
+                  <div key={message.id} className="mb-6">
+                    <div className="bg-neutral-800 rounded-lg p-6">
+                      <p className="text-neutral-100 whitespace-pre-wrap">
+                        Tool call received. Waiting for result...
+                      </p>
+                    </div>
+                  </div>
+                );
               const isWriteMemory = message.tool.name === "write_memory";
               const memoryInput =
                 isWriteMemory &&
