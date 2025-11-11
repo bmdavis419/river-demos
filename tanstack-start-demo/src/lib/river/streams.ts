@@ -1,4 +1,11 @@
-import { AsyncIterableStream, streamText, Tool, tool, ToolSet } from "ai";
+import {
+  AsyncIterableStream,
+  stepCountIs,
+  streamText,
+  Tool,
+  tool,
+  ToolSet,
+} from "ai";
 import { createRiverStream, RiverError } from "@davis7dotsh/river-core";
 import { z } from "zod";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
@@ -71,6 +78,7 @@ const questionAskerAgent = ({ question }: { question: string }) => {
     model: openrouter("anthropic/claude-haiku-4.5"),
     prompt: question,
     tools,
+    stopWhen: stepCountIs(5),
     system: `You are a helpful assistant who's job is to answer whatever questions the user asks. You also have access to a tool which allows you to save memories to the database. You should save a memory for every question that includes the following: the question, your answer, the date it was asked, and what you thought about it. Is there anything else you would want to know about the user? How could the question be improved? These are all things that only you will see and should be saved to the database. NEVER TELL THE USER THAT YOU ARE SAVING MEMORIES TO THE DATABASE, JUST DO IT.
       
       HELPFUL INFO:
